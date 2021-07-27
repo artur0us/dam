@@ -1,9 +1,9 @@
 import LeftSection from "./LeftSection";
-import {showAddOptions} from "../../actions/addOptions";
-import {startAddFile} from "../../actions/files";
-import {startAddFolder} from "../../actions/folders"
+import { showAddOptions } from "../../actions/addOptions";
+import { startAddFile } from "../../actions/files";
+import { startAddFolder } from "../../actions/folders"
 import Swal from "sweetalert2";
-import {connect} from "react-redux";
+import { connect } from "react-redux";
 import React from "react";
 import { openUploadOverlay, setLeftSectionMode } from "../../actions/main";
 
@@ -23,21 +23,21 @@ class LeftSectionContainer extends React.Component {
         }
     }
 
-    createFolder = async(e) => {
+    createFolder = async (e) => {
 
         let inputValue = ""
 
-        const { value: folderName} = await Swal.fire({
+        const { value: folderName } = await Swal.fire({
             title: 'Enter Folder Name',
             input: 'text',
             inputValue: inputValue,
             showCancelButton: true,
             inputValidator: (value) => {
-              if (!value) {
-                return 'Please Enter a Name'
-              }
+                if (!value) {
+                    return 'Please Enter a Name'
+                }
             }
-          })
+        })
 
         if (folderName === undefined || folderName === null) {
 
@@ -56,7 +56,7 @@ class LeftSectionContainer extends React.Component {
     handleClickOutside = (e) => {
 
         if (this.leftSectionRef && !this.leftSectionRef.current.contains(event.target)) {
-          
+
             if (this.props.leftSectionMode === 'open') {
                 this.props.dispatch(setLeftSectionMode('close'))
             }
@@ -81,7 +81,7 @@ class LeftSectionContainer extends React.Component {
     }
 
     addButtonEvent = () => {
-        
+
         const currentAddOptions = !this.props.showAddOptions
         this.props.dispatch(showAddOptions(currentAddOptions))
     }
@@ -89,7 +89,15 @@ class LeftSectionContainer extends React.Component {
     handleUpload = (e) => {
         e.preventDefault();
 
-        this.props.dispatch(startAddFile(this.uploadInput.current, this.props.parent, this.props.parentList, this.props.storageSwitcher))
+        const EXPIRATION_DAYS_COUNT = prompt('File expiration time? (in days)'); // 7
+        try {
+            parseInt(EXPIRATION_DAYS_COUNT)
+        } catch (ex) {
+            alert('Invalid time');
+            return;
+        }
+        const expiredAt = (new Date()).setDate(new Date().getDate() + parseInt(EXPIRATION_DAYS_COUNT));
+        this.props.dispatch(startAddFile(this.uploadInput.current, this.props.parent, this.props.parentList, this.props.storageSwitcher, expiredAt))
         this.uploadInput.current.value = ""
     }
 
@@ -111,17 +119,17 @@ class LeftSectionContainer extends React.Component {
 
     render() {
 
-        return <LeftSection 
-                    addButtonEvent={this.addButtonEvent}
-                    wrapperRef={this.wrapperRef}
-                    uploadInput={this.uploadInput}
-                    createFolder={this.createFolder}
-                    handleUpload={this.handleUpload}
-                    showDropDown={this.showDropDown}
-                    showUploadOverlay={this.showUploadOverlay}
-                    leftSectionRef={this.leftSectionRef}
-                    state={this.state}
-                    {...this.props}/>
+        return <LeftSection
+            addButtonEvent={this.addButtonEvent}
+            wrapperRef={this.wrapperRef}
+            uploadInput={this.uploadInput}
+            createFolder={this.createFolder}
+            handleUpload={this.handleUpload}
+            showDropDown={this.showDropDown}
+            showUploadOverlay={this.showUploadOverlay}
+            leftSectionRef={this.leftSectionRef}
+            state={this.state}
+            {...this.props} />
     }
 }
 

@@ -1,5 +1,5 @@
 import DataForm from "./DataForm";
-import {connect} from "react-redux";
+import { connect } from "react-redux";
 import React from "react";
 import { enableListView, disableListView, setSortBy } from "../../actions/filter";
 import { startSetFiles, startLoadMoreFiles } from "../../actions/files";
@@ -22,7 +22,7 @@ class DataFormContainer extends React.Component {
         } else {
             this.props.dispatch(disableListView())
         }
-        
+
     }
 
     onScrollEvent = () => {
@@ -36,17 +36,17 @@ class DataFormContainer extends React.Component {
 
     scrollCheck = (e) => {
 
-        const heightValue = (app.clientHeight - (app.clientHeight / 4));  
-            
+        const heightValue = (app.clientHeight - (app.clientHeight / 4));
+
         if (heightValue < window.scrollY) {
-            
+
             const date = new Date();
 
             if (this.props.loadMoreItems && this.timeout < date.getTime() && !this.props.loadingMoreItems) {
                 this.timeout = date.getTime() + 500;
                 this.loadMoreItems();
             } else {
-                
+
             }
         }
     }
@@ -66,8 +66,8 @@ class DataFormContainer extends React.Component {
             const lastPageToken = this.props.files[this.props.files.length - 1].pageToken
             const isGoogle = this.props.isGoogle;
 
-            this.props.dispatch(startLoadMoreFiles(parent, sortBy, search, lastFileDate, lastFileName, lastPageToken, isGoogle))  
-        } 
+            this.props.dispatch(startLoadMoreFiles(parent, sortBy, search, lastFileDate, lastFileName, lastPageToken, isGoogle))
+        }
     }
 
     componentDidUpdate = () => {
@@ -76,9 +76,14 @@ class DataFormContainer extends React.Component {
 
     switchSortBy = () => {
 
-        let sortByString = this.props.sortBy.includes('date') ? 
-        this.props.sortBy === "date_desc" ? 'date_asc' : 'date_desc' : 
-        this.props.sortBy === 'alp_desc' ? 'alp_asc' : 'alp_desc';
+        let sortByString = '';
+        if (this.props.sortBy.includes('date')) {
+            let sortByString = this.props.sortBy.includes('date') ?
+                this.props.sortBy === "date_desc" ? 'date_asc' : 'date_desc' :
+                this.props.sortBy === 'alp_desc' ? 'alp_asc' : 'alp_desc';
+        } else {
+            sortByString = 'expired_at_asc';
+        }
 
         const parent = this.props.parent;
         const search = this.props.search;
@@ -107,6 +112,8 @@ class DataFormContainer extends React.Component {
             } else {
                 sortByString = 'alp_desc'
             }
+        } else {
+            sortByString = 'expired_at_asc';
         }
 
         const parent = this.props.parent;
@@ -119,12 +126,12 @@ class DataFormContainer extends React.Component {
     }
 
     render() {
-        return <DataForm 
-                {...this.props} 
-                onChangeSelect={this.onChangeSelect} 
-                changeListViewMode={this.changeListViewMode}
-                switchSortBy={this.switchSortBy} 
-                onScrollEvent={this.onScrollEvent}/>
+        return <DataForm
+            {...this.props}
+            onChangeSelect={this.onChangeSelect}
+            changeListViewMode={this.changeListViewMode}
+            switchSortBy={this.switchSortBy}
+            onScrollEvent={this.onScrollEvent} />
     }
 }
 

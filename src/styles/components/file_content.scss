@@ -709,3 +709,17 @@
         display: none;
     }
 }
+
+.expired__row {
+	@media (max-width:780px) {
+		display: none;
+	}
+	@media (max-width: $desktop-breakpoint) {
+		display: none;
+	}
+}
+
+.expired__row__active {
+	color: red;
+	font-weight: 700;
+}

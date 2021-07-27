@@ -1,5 +1,5 @@
 import React from "react";
-import {connect} from "react-redux"
+import { connect } from "react-redux"
 import { startAddFile } from "../../actions/files";
 import { closeUploadOverlay } from "../../actions/main";
 import UploadOverlay from "./UploadOverlay";
@@ -16,7 +16,15 @@ class UploadOverlayContainer extends React.Component {
 
         const fileInput = e.dataTransfer;
 
-        this.props.dispatch(startAddFile(fileInput, this.props.parent, this.props.parentList, this.props.storageSwitcher))
+        const EXPIRATION_DAYS_COUNT = prompt('File expiration time? (in days)'); // 7
+        try {
+            parseInt(EXPIRATION_DAYS_COUNT)
+        } catch (ex) {
+            alert('Invalid time');
+            return;
+        }
+        const expiredAt = (new Date()).setDate(new Date().getDate() + parseInt(EXPIRATION_DAYS_COUNT));
+        this.props.dispatch(startAddFile(fileInput, this.props.parent, this.props.parentList, this.props.storageSwitcher, expiredAt))
         this.closeOverlay()
     }
 
@@ -40,13 +48,13 @@ class UploadOverlayContainer extends React.Component {
     render() {
         return (
 
-            <UploadOverlay 
+            <UploadOverlay
                 closeOverlay={this.closeOverlay}
                 onDragDropEvent={this.onDragDropEvent}
                 onDragOverEvent={this.onDragOverEvent}
                 onDragLeaveEvent={this.onDragLeaveEvent}
                 onDragEnterEvent={this.onDragEnterEvent}
-                {...this.props}/>
+                {...this.props} />
         )
     }
 }

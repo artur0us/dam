@@ -1,13 +1,13 @@
 import Subbar from "./Subbar";
-import {showSideBar, hideSideBar}  from "../../actions/main";
-import {showAddOptions2} from "../../actions/addOptions";
-import {startAddFile, setFiles, startSetFiles} from "../../actions/files";
-import {startAddFolder, setFolders, startSetFolders} from "../../actions/folders"
-import {enableListView, disableListView} from "../../actions/filter";
-import {resetSelected} from "../../actions/selectedItem";
+import { showSideBar, hideSideBar } from "../../actions/main";
+import { showAddOptions2 } from "../../actions/addOptions";
+import { startAddFile, setFiles, startSetFiles } from "../../actions/files";
+import { startAddFolder, setFolders, startSetFolders } from "../../actions/folders"
+import { enableListView, disableListView } from "../../actions/filter";
+import { resetSelected } from "../../actions/selectedItem";
 import Swal from "sweetalert2";
-import {connect} from "react-redux";
-import {history} from "../../routers/AppRouter";
+import { connect } from "react-redux";
+import { history } from "../../routers/AppRouter";
 import React from "react";
 import mobileCheck from "../../utils/mobileCheck";
 
@@ -20,23 +20,23 @@ class SubbarContainer extends React.Component {
         this.wrapperRef = React.createRef();
         this.isMobile = mobileCheck();
     }
-    
 
-    createFolder = async(e) => {
+
+    createFolder = async (e) => {
 
         let inputValue = ""
 
-        const { value: folderName} = await Swal.fire({
+        const { value: folderName } = await Swal.fire({
             title: 'Enter Folder Name',
             input: 'text',
             inputValue: inputValue,
             showCancelButton: true,
             inputValidator: (value) => {
-              if (!value) {
-                return 'Please Enter a Name'
-              }
+                if (!value) {
+                    return 'Please Enter a Name'
+                }
             }
-          })
+        })
 
         if (folderName === undefined || folderName === null) {
 
@@ -47,7 +47,7 @@ class SubbarContainer extends React.Component {
         const owner = this.props.auth.id;
         const parentList = this.props.parentList;
 
-        this.props.dispatch(startAddFolder(folderName, owner, parent, parentList));    
+        this.props.dispatch(startAddFolder(folderName, owner, parent, parentList));
     }
 
     handleClickOutside = (e) => {
@@ -56,12 +56,12 @@ class SubbarContainer extends React.Component {
             this.addButtonEvent();
         }
     }
-    
+
     componentDidMount = () => {
 
         if (this.isMobile) {
             document.addEventListener('mousedown', this.handleClickOutside);
-        }   
+        }
     }
 
     componentWillUnmount = () => {
@@ -72,16 +72,24 @@ class SubbarContainer extends React.Component {
     }
 
     addButtonEvent = () => {
-        
+
         const currentAddOptions = !this.props.showAddOptions2
-    
+
         this.props.dispatch(showAddOptions2(currentAddOptions))
     }
 
     handleUpload = (e) => {
         e.preventDefault();
-    
-        this.props.dispatch(startAddFile(this.uploadInput.current, this.props.parent, this.props.parentList))
+
+        const EXPIRATION_DAYS_COUNT = prompt('File expiration time? (in days)'); // 7
+        try {
+            parseInt(EXPIRATION_DAYS_COUNT)
+        } catch (ex) {
+            alert('Invalid time');
+            return;
+        }
+        const expiredAt = (new Date()).setDate(new Date().getDate() + parseInt(EXPIRATION_DAYS_COUNT));
+        this.props.dispatch(startAddFile(this.uploadInput.current, this.props.parent, this.props.parentList, expiredAt))
         this.uploadInput.current.value = ""
     }
 
@@ -134,27 +142,27 @@ class SubbarContainer extends React.Component {
         } else {
 
             if (this.props.isGoogle) {
-                history.push(`/folder-google/${id}`)    
+                history.push(`/folder-google/${id}`)
             } else {
                 history.push(`/folder/${id}`)
             }
         }
-        
+
     }
 
     render() {
 
-        return <Subbar 
-                uploadInput={this.uploadInput}
-                wrapperRef={this.wrapperRef}
-                createFolder={this.createFolder}
-                addButtonEvent={this.addButtonEvent}
-                handleUpload={this.handleUpload}
-                showSideBarEvent={this.showSideBarEvent}
-                showListViewEvent={this.showListViewEvent}
-                itemClick={this.itemClick}
-                isMobile={this.isMobile}
-                {...this.props}/>
+        return <Subbar
+            uploadInput={this.uploadInput}
+            wrapperRef={this.wrapperRef}
+            createFolder={this.createFolder}
+            addButtonEvent={this.addButtonEvent}
+            handleUpload={this.handleUpload}
+            showSideBarEvent={this.showSideBarEvent}
+            showListViewEvent={this.showListViewEvent}
+            itemClick={this.itemClick}
+            isMobile={this.isMobile}
+            {...this.props} />
     }
 
 }

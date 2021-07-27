@@ -1,0 +1,66 @@
+# cls; docker-compose down; docker-compose stop; docker-compose kill; docker-compose rm -f; docker-compose -f docker-compose-with-mongo.yml up --build --force-recreate --no-deps
+
+version: '2'
+
+services:
+  mongo:
+    container_name: mongo
+    image: mongo
+    restart: always
+    logging:
+      driver: none
+      options:
+        max-size: "1m"
+    expose:
+      - 27017
+    ports:
+      - 27017:27017
+  mongo_express:
+    image: mongo-express
+    restart: always
+    logging:
+      driver: none
+      options:
+        max-size: "1m"
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongo
+    ports:
+      - 8081:8081
+    depends_on:
+      - mongo
+  dam:
+    container_name: dam
+    build:
+      context: .
+      args: 
+        - PROXY
+        - NO_PROXY
+        - NPM_REGISTRY
+        - REMOTE_URL
+    environment:
+      HOST: ''
+      NODE_ENV: 'development'
+      DB_TYPE: 'fs'
+      DOCKER: 'true'
+      FS_DIRECTORY: '/files/'
+      DISABLE_EMAIL_VERIFICATION: 'true'
+      DISABLE_STORAGE: 'true'
+      MONGODB_URL: 'mongodb://mongo:27017'
+      PASSWORD_ACCESS: 'ca9cfc3070a69fcca8980c16064bfbd1fa118adc64ac1496ea8beca8c68dcecd'
+      PASSWORD_REFRESH: 'a8f90dc1cdb5333a4bd6ba92462c346b6f79708e9d245579a366a912a3627bc1'
+      PASSWORD_COOKIE: '30bbf48416e35af8902faf239aecf6b367262899352fed75976694d18c042cf2'
+    ports: 
+      - 4029:8080
+    # volumes:
+    #   - dam-vol:$FS_DIRECTORY
+    mem_limit: 1g
+    # logging: 
+    #   driver: 'fluentd'
+    #   options: 
+    #     fluentd-async-connect: "true"
+    #     fluentd-address: $HOST:24224
+    #     tag: docker.dam
+    # network_mode: bridge
+    restart: always
+# volumes: 
+#   dam-vol:
